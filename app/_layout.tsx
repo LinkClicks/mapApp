@@ -86,29 +86,44 @@ const CustomDrawer = () => {
         width: isLandscape ? '70%' : '80%',
       },
     }}>
-     <Drawer.Screen 
-        name="index" 
-        options={{ 
-          title: 'Home', 
-          drawerLabel: 'Home',
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),  
-          headerShown: false, 
-          swipeEdgeWidth: 0,
-          drawerItemStyle: drawerStyles.drawerItem,
-          drawerLabelStyle: drawerStyles.drawerLabel
-        }} 
-      />
+    <Drawer.Screen 
+      name="index" 
+      options={{ 
+        title: 'Home', 
+        drawerLabel: 'Home',
+        drawerIcon: ({ color, size }) => (
+          <Ionicons name="home" size={size} color={color} />
+        ),  
+        headerShown: false, 
+        swipeEdgeWidth: 0,
+        drawerItemStyle: drawerStyles.drawerItem,
+        drawerLabelStyle: drawerStyles.drawerLabel
+      }} 
+    />
+
+    <Drawer.Screen 
+      name="data" 
+      options={{ 
+        title: 'Data', 
+        drawerLabel: 'Data',
+        drawerIcon: ({ color, size }) => (
+          <Ionicons name="settings" size={size} color={color} />
+        ),  
+        headerShown: false, 
+        swipeEdgeWidth: 0,
+        drawerItemStyle: drawerStyles.drawerItem,
+        drawerLabelStyle: drawerStyles.drawerLabel
+      }} 
+    />
           
-       <Drawer.Screen 
-        name="+not-found" 
-        options={{ 
-          title: 'Not Found', 
-          headerShown: false, 
-          drawerItemStyle: { display: 'none' },
-          swipeEdgeWidth: 0
-        }} 
+    <Drawer.Screen 
+      name="+not-found" 
+      options={{ 
+        title: 'Not Found', 
+        headerShown: false, 
+        drawerItemStyle: { display: 'none' },
+        swipeEdgeWidth: 0
+      }} 
       />
     </Drawer>
   );

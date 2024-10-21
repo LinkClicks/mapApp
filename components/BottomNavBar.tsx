@@ -48,12 +48,22 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({
         <View style={[styles.sideNav, {paddingRight: adjustedInsets.right, marginLeft: -adjustedInsets.right}]}>
           <TouchableOpacity
             style={styles.navButton}
-            onPress={() => navigation.dispatch(DrawerActions.jumpTo('trips'))}
+            onPress={() => navigation.dispatch(DrawerActions.jumpTo('index'))}
             activeOpacity={0.6}
             hitSlop={{ top: 20, bottom: 20, left: 40, right: 60 }}
           >
             <Ionicons name="bicycle" size={40} color={textColor} />
             <Text style={[styles.navText, { color: textColor }]}  >Trips</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.navButton}
+            onPress={() => navigation.dispatch(DrawerActions.jumpTo('data'))}
+            activeOpacity={0.6}
+            hitSlop={{ top: 20, bottom: 20, left: 40, right: 60 }}
+          >
+            <Ionicons name="settings" size={40} color={textColor} />
+            <Text style={[styles.navText, { color: textColor }]}  >Data</Text>
           </TouchableOpacity>
          
         </View>
@@ -67,6 +77,16 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({
             <Ionicons name="bicycle" size={40} color={textColor} />
             <Text style={[styles.navText, { color: textColor }]}
               >Trips</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.navButton}
+            onPress={() => navigation.dispatch(DrawerActions.jumpTo('data'))}
+            activeOpacity={0.6}
+            hitSlop={{ top: 20, bottom: 20, left: 40, right: 60 }}
+          >
+            <Ionicons name="settings" size={40} color={textColor} />
+            <Text style={[styles.navText, { color: textColor }]}  >Data</Text>
           </TouchableOpacity>
          
         </View>

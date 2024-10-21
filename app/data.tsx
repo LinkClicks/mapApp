@@ -16,9 +16,9 @@ import BottomNavBar from '../components/BottomNavBar';
 import uuid from 'react-native-uuid';
 import { useTrips } from '../context/TripsContext';
 
-const FILE_PATH = 'app/import.tsx';
+const FILE_PATH = 'app/data.tsx';
 
-const ImportScreen: React.FC = () => {
+const DataScreen: React.FC = () => {
   const { colors } = useTheme();
   const colorScheme = colors.background === DarkTheme.colors.background ? 'dark' : 'light';
   const navigation = useNavigation();
@@ -158,7 +158,7 @@ const ImportScreen: React.FC = () => {
       <Stack.Screen
         options={{
           headerShown: true,
-          headerTitle: 'Import',
+          headerTitle: 'Data Stuff',
           headerTitleAlign: 'center',
           headerStyle: {
             backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
@@ -252,4 +252,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ImportScreen;
+export default DataScreen;
