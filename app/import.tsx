@@ -11,7 +11,7 @@ import { logMessage, logError, isLoggingEnabled } from '../utils/logger';
 import JSZip from 'jszip';
 import * as DocumentPicker from 'expo-document-picker';
 import { useSnackbar } from '@/context/SnackbarContext';
-import { insertTrip, insertTrackingPoint, updateRouteSettings } from '@/database';
+import { insertTrip, insertTrackingPoint, updateRouteSettings, clearRotationAndMapCenterForAllTrips } from '@/database';
 import BottomNavBar from '../components/BottomNavBar';
 import uuid from 'react-native-uuid';
 import { useTrips } from '../context/TripsContext';
@@ -27,7 +27,16 @@ const ImportScreen: React.FC = () => {
   const [fileList, setFileList] = useState<{ name: string; size: string }[]>([]);
 
   const { loadTrips } = useTrips();
-
+  
+  const handleClearRotationAndMapCenter = async () => {
+    try {
+      await clearRotationAndMapCenterForAllTrips();
+      showMessage('Cleared rotation and map center for all trips');
+    } catch (error: any) {
+      logError(`${FILE_PATH} - Error in handleClearRotationAndMapCenter`, { error: error.message || error.toString(), stack: error.stack });
+      showMessage('Failed to clear rotation and map center for all trips');
+    }
+  };
 
   const handleImportData = async () => {
     try {
@@ -169,12 +178,19 @@ const ImportScreen: React.FC = () => {
         }}
       />
       <ScrollView contentContainerStyle={styles.content}>
-             
-       
-        <TouchableOpacity style={styles.shareButton} onPress={handleImportData}>
-          <Text style={styles.shareButtonText}>Import Data</Text>
-        </TouchableOpacity>
-            
+        {/* Import Data button */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.shareButton} onPress={handleImportData}>
+            <Text style={styles.shareButtonText}>Import Data</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Clear Rotation and Map Center button */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.clearButton} onPress={handleClearRotationAndMapCenter}>
+            <Text style={styles.clearButtonText}>Clear Rotation and Map Center</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
       <BottomNavBar
@@ -205,93 +221,34 @@ const styles = StyleSheet.create({
   menuButton: {
     marginLeft: 10,
   },
+  buttonContainer: {
+    width: '90%',
+    marginTop: 20, // Add spacing between buttons
+    alignItems: 'center',
+  },
   shareButton: {
     backgroundColor: '#1e90ff',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 20,
   },
   shareButtonText: {
     fontSize: 16,
     color: '#fff',
     fontWeight: 'bold',
   },
-  deleteButton: {
+  clearButton: {
     backgroundColor: '#ff6347',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 20,
   },
-  deleteButtonText: {
+  clearButtonText: {
     fontSize: 16,
     color: '#fff',
     fontWeight: 'bold',
-  },
-  fileListContainer: {
-    marginTop: 30,
-    width: '90%',
-  },
-  fileItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  fileName: {
-    fontSize: 16,
-    color: '#333',
-  },
-  fileSize: {
-    fontSize: 14,
-    color: '#888',
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  modalMessage: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  modalButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  modalButton: {
-    flex: 1,
-    backgroundColor: '#1e90ff',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginHorizontal: 5,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  modalButtonCancel: {
-    backgroundColor: '#ff6347',
   },
 });
 

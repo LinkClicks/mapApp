@@ -741,3 +741,26 @@ export const insertOrUpdateTrackingPoint = async (
   }
 };
 
+
+export const clearRotationAndMapCenterForAllTrips = async (): Promise<void> => {
+  try {
+    db.transaction(tx => {
+      tx.executeSql(
+        'UPDATE trips SET rotation_angle = NULL, map_center_latitude = NULL, map_center_longitude = NULL;',
+        [],
+        () => {
+          logMessage(`${FILE_PATH} - clearRotationAndMapCenterForAllTrips - Cleared rotation and map center for all trips.`);
+        },
+        (tx, error) => {
+          logError(`${FILE_PATH} - clearRotationAndMapCenterForAllTrips - Error clearing rotation and map center`, error);
+          return false;
+        }
+      );
+    });
+  } catch (error) {
+    logError(`${FILE_PATH} - clearRotationAndMapCenterForAllTrips - General error`, error);
+    throw error;
+  }
+};
+
+
