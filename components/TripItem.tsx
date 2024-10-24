@@ -86,6 +86,13 @@ const rotateCoordinate = (coordinate: Coordinate, angle: number, center: Coordin
   return toLatLon(rotatedCartesian);
 };
 
+const convertAltitudeToZoom = (altitude: number) => {
+  let zoom = Math.round(Math.log(35200000 / altitude) / Math.log(2)); 
+  if (zoom < 0) zoom = 0; 
+  else if (zoom > 19) zoom = 19; 
+  return zoom;
+};
+
 const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'dark' | 'light', isVisible: boolean }) => {
   const { settings } = useSettings();
   const { orientation, isLandscape, adjustedInsets } = useOrientation();
@@ -123,6 +130,7 @@ const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'd
     let bestAngle = 0;
     let rotationAngle = trip.rotationAngle;
     let mapCenter = trip.mapCenter;
+    let mapAltitude = trip.mapAltitude;
     let routeWidth = trip.routeDimensions?.width;
     let routeHeight = trip.routeDimensions?.height;
     let bestWidth;
@@ -147,11 +155,12 @@ const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'd
       };
 
       console.log('mapCenter', mapCenter);
+      console.log('mapAltitude', mapAltitude);
       console.log('routeWidth', routeWidth);
       console.log('routeHeight', routeHeight);
 
-      if (!mapCenter || !routeWidth || !routeHeight) {
-        console.log('!mapCenter || !routeWidth || !routeHeight');
+      if (!mapCenter || !routeWidth || !routeHeight || !mapAltitude) {
+        console.log('!mapCenter || !routeWidth || !routeHeight || !mapAltitude');
         
         for (let angle = 0; angle <= 90; angle += 1) {
           const rotatedCoordinates = coordinates.map((coordinate: Coordinate) =>
@@ -219,20 +228,23 @@ const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'd
           routeHeight = bestBoundingBox.maxLat - bestBoundingBox.minLat;
         }
 
+        mapAltitude = calculateAltitude(routeWidth, routeHeight, mapWidth, mapHeight);
+
         if (mapCenter) {
-          updateRouteSettings(trip.id, rotationAngle, routeWidth, routeHeight, mapCenter);
+          updateRouteSettings(trip.id, rotationAngle, routeWidth, routeHeight, mapCenter, mapAltitude);
         }
       } 
-      const altitude = calculateAltitude(routeWidth, routeHeight, mapWidth, mapHeight);
-
+     
       console.log('rotationAngle', rotationAngle);
-      console.log('altitude', altitude);
+      console.log('mapAltitude b', mapAltitude);
+
+      const zoom = convertAltitudeToZoom(mapAltitude) - 0.7;
       camera = {
         center: mapCenter,
         heading: rotationAngle,
         pitch: 0,
-        zoom: 1,
-        altitude,
+        zoom: zoom,
+        altitude: mapAltitude,
       };
     } else if (trip.trackPoints.length > 0) {
       console.log('trip.trackPoints.length > 0');
@@ -263,33 +275,6 @@ const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'd
     }
   }, [trip.trackPoints, isVisible, orientation]);
 
-  useEffect(() => {
-    if (isVisible && mapRef.current && trip.trackPoints.length > 0 && Platform.OS === 'android') {
-      //mapRef.current.animateToRegion({
-      //  latitude: trip.mapCenter.latitude,
-      //  longitude: trip.mapCenter.longitude,
-      //  latitudeDelta: 0.02,  // Adjust as necessary for better zoom
-      //  longitudeDelta: 0.02,        
-      //}, 1000);
-
-      //mapRef.current.fitToCoordinates(trip.trackPoints, {
-      //});
-
-      mapRef.current.setCamera({
-        center: trip.mapCenter,
-        heading: trip.rotationAngle, 
-        pitch: 0,
-        zoom: 12,
-        altitude: 1000
-      });
-     
-    }
-  }, [isVisible, trip.trackPoints]);
-
- 
-  
-  
-  
 
   const renderBoundingBox = (boundingBox: BoundingBox, color: string) => {
     const coordinates = [

@@ -341,6 +341,44 @@ const TripListScreen: React.FC = () => {
           <Text style={[styles.headerTitle, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
             Trips
           </Text>
+          <View style={[styles.segmentedControlContainer, isLandscape ? {right: adjustedInsets.right + 100} : {right: adjustedInsets.right}]}>
+            <View style={isLandscape ? [styles.segmentedControl, { paddingRight: adjustedInsets.right + 30, paddingLeft: adjustedInsets.left }] : [styles.segmentedControl]}>
+              <TouchableOpacity
+                hitSlop={{ top: 20, bottom: 0, left: 20, right: 0 }}
+                style={[
+                  styles.segmentButton,
+                  selectedOption === 'Date'
+                    ? colorScheme === 'dark'
+                      ? styles.selectedSegmentButtonDark
+                      : styles.selectedSegmentButtonLight
+                    : colorScheme === 'dark'
+                    ? styles.unselectedSegmentButtonDark
+                    : styles.unselectedSegmentButtonLight,
+                ]}
+                onPress={() => handleSortingOptionChange('Date')}
+              >
+                <Text style={[styles.segmentButtonText, colorScheme === 'dark' ? styles.darkText : styles.lightText]}
+                  >Date</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                hitSlop={{ top: 20, bottom: 0, left: 0, right: 20 }}
+                style={[
+                  styles.segmentButton,
+                  selectedOption === 'Dist'
+                    ? colorScheme === 'dark'
+                      ? styles.selectedSegmentButtonDark
+                      : styles.selectedSegmentButtonLight
+                    : colorScheme === 'dark'
+                    ? styles.unselectedSegmentButtonDark
+                    : styles.unselectedSegmentButtonLight,
+                ]}
+                onPress={() => handleSortingOptionChange('Dist')}
+              >
+                <Text style={[styles.segmentButtonText, colorScheme === 'dark' ? styles.darkText : styles.lightText]}
+                  >Dist</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
         <View style={[getStyle(orientation, adjustedInsets)]}>
         { loading ? (
@@ -455,7 +493,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center', // Center the header content
+    justifyContent: 'space-between',
     zIndex: 100,
     backgroundColor: '#000',
   },
@@ -467,6 +505,8 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 26,
     fontWeight: 'bold',
+    textAlign: 'center',
+    flex: 1, 
   },
   darkBackground: {
     backgroundColor: '#000',
@@ -667,7 +707,41 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 26,
   },
- 
+  segmentedControlContainer: {
+    position: 'absolute',
+  },
+  segmentedControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 5,
+  },
+  segmentButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  selectedSegmentButtonLight: {
+    backgroundColor: '#d3d3d3',
+    borderColor: '#d3d3d3',
+    borderWidth: 2,
+  },
+  unselectedSegmentButtonLight: {
+    backgroundColor: '#fff',
+    borderColor: '#d3d3d3',
+    borderWidth: 2,
+  },
+  selectedSegmentButtonDark: {
+    backgroundColor: '#333',
+    borderColor: '#333',
+    borderWidth: 2,
+  },
+  unselectedSegmentButtonDark: {
+    backgroundColor: '#000',
+    borderColor: '#333',
+    borderWidth: 2,
+  },
+  segmentButtonText: {
+    fontSize: 20,
+  }
   
 });
 
