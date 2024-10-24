@@ -265,14 +265,29 @@ const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'd
 
   useEffect(() => {
     if (isVisible && mapRef.current && trip.trackPoints.length > 0 && Platform.OS === 'android') {
-      mapRef.current.animateToRegion({
-        latitude: trip.trackPoints[0].latitude,
-        longitude: trip.trackPoints[0].longitude,
-        latitudeDelta: 0.02,  // Adjust as necessary for better zoom
-        longitudeDelta: 0.02,
-      }, 1000);
+      //mapRef.current.animateToRegion({
+      //  latitude: trip.mapCenter.latitude,
+      //  longitude: trip.mapCenter.longitude,
+      //  latitudeDelta: 0.02,  // Adjust as necessary for better zoom
+      //  longitudeDelta: 0.02,        
+      //}, 1000);
+
+      //mapRef.current.fitToCoordinates(trip.trackPoints, {
+      //});
+
+      mapRef.current.setCamera({
+        center: trip.mapCenter,
+        heading: trip.rotationAngle, 
+        pitch: 0,
+        zoom: 12,
+        altitude: 1000
+      });
+     
     }
   }, [isVisible, trip.trackPoints]);
+
+ 
+  
   
   
 
@@ -354,7 +369,6 @@ const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'd
       mapAspectRatio = mapHeight / mapWidth
     }
       
-
     // Convert the width and height of the bounding box to meters using the Web Mercator projection
     const widthInMeters = (routeWidth * earthCircumference) / 360;
     const heightInMeters = (routeHeight * earthCircumference) / 360;
