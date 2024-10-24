@@ -1,3 +1,4 @@
+// app/data/tsx
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Modal,
@@ -31,6 +32,7 @@ const DataScreen: React.FC = () => {
   const handleClearRotationAndMapCenter = async () => {
     try {
       await clearRotationAndMapCenterForAllTrips();
+      await loadTrips(); 
       showMessage('Cleared rotation and map center for all trips');
     } catch (error: any) {
       logError(`${FILE_PATH} - Error in handleClearRotationAndMapCenter`, { error: error.message || error.toString(), stack: error.stack });
