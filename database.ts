@@ -407,6 +407,7 @@ export const deleteTrip = async (id: string): Promise<void> => {
 
 export const fetchTripsGroupedByMonth = async (): Promise<GroupedTrip[]> => {
   try {
+    console.log(`${FILE_PATH} - fetchTripsGroupedByMonth - Fetching trips grouped by month`);
     return new Promise((resolve, reject) => {
       db.transaction(tx => {
         tx.executeSql(
