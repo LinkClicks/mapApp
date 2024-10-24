@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Modal,
   StatusBar, ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,6 +27,7 @@ const DataScreen: React.FC = () => {
   const { showMessage } = useSnackbar();
   const [modalVisible, setModalVisible] = useState(false);
   const [fileList, setFileList] = useState<{ name: string; size: string }[]>([]);
+  const [loading, setLoading] = useState(false); 
 
   const { loadTrips } = useTrips();
   
@@ -43,6 +45,8 @@ const DataScreen: React.FC = () => {
   const handleImportData = async () => {
     try {
       logMessage(`${FILE_PATH} - handleImportData called`);
+
+      setLoading(true);
   
       const result = await DocumentPicker.getDocumentAsync({
         type: 'application/zip',
@@ -112,7 +116,7 @@ const DataScreen: React.FC = () => {
               const center = mapCenter ?? null;
     
               if (rotation || width || height || center) {
-                await updateRouteSettings(newTripId, rotation, width, height, center);
+                await updateRouteSettings(newTripId, rotation, width, height, center, null);
               }
             } catch (error) {
               logError(`${FILE_PATH} - Error inserting trip data`, { error });
@@ -151,6 +155,8 @@ const DataScreen: React.FC = () => {
     } catch (error: any) {
       logError(`${FILE_PATH} - Error in handleImportData`, { error: error.message || error.toString(), stack: error.stack });
       showMessage('Failed to import data');
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -180,19 +186,23 @@ const DataScreen: React.FC = () => {
         }}
       />
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Import Data button */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.shareButton} onPress={handleImportData}>
-            <Text style={styles.shareButtonText}>Import Data</Text>
-          </TouchableOpacity>
-        </View>
+      {loading ? ( // Show loader when loading
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.shareButton} onPress={handleImportData}>
+              <Text style={styles.shareButtonText}>Import Data</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Clear Rotation and Map Center button */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.clearButton} onPress={handleClearRotationAndMapCenter}>
-            <Text style={styles.clearButtonText}>Clear Rotation and Map Center</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.clearButton} onPress={handleClearRotationAndMapCenter}>
+              <Text style={styles.clearButtonText}>Clear Rotation and Map Center</Text>
+            </TouchableOpacity>
+          </View>
+          </>
+        )}
       </ScrollView>
 
       <BottomNavBar

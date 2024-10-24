@@ -282,7 +282,7 @@ export const updateRouteSettings = async (
   width: number,
   height: number,
   mapCenter: { latitude: number, longitude: number },
-  mapAltitude: number
+  mapAltitude: number | null
 ): Promise<void> => {
   try {
     db.transaction(tx => {
