@@ -92,7 +92,6 @@ const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'd
   const unit = settings.unit!;
   const mapRef = useRef<MapView | null>(null);
 
-  console.log('TripItem.tsx: trip', trip);
   const setupMapCamera = () => {
     let mapWidth;
     let mapHeight;
@@ -132,8 +131,6 @@ const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'd
     let smallestSide = Infinity;
     let rotatedBoundingBoxCoordinates: Coordinate[] = [];
 
-   
-    console.log('trip', trip);
     console.log('trip.distance', trip.distance);
     console.log('min distance', MIN_DISTANCE); 
     console.log('trip.trackPoints.length', trip.trackPoints.length);
@@ -524,11 +521,10 @@ const TripItem = ({ trip, colorScheme, isVisible }: { trip: any, colorScheme: 'd
           {renderPolyline()}
           {renderFlags()}
           
-          {/*
           {boundingBoxData.bestBoundingBox && renderBoundingBox(boundingBoxData.bestBoundingBox, 'rgba(255,0,0,0.4)')}
           {boundingBoxData.rotatedBoundingBoxCoordinates.length > 0 &&
             renderRotatedBoundingBox(boundingBoxData.rotatedBoundingBoxCoordinates, 'rgba(0,255,0,0.5)')}
-          */}
+
         </MapView>
       </View>
       
