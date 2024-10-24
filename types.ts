@@ -35,7 +35,8 @@ export interface Trip {
   mapCenter: {
     latitude: number | null;
     longitude: number | null;
-  } | null;  // Nullable in case the center is not set
+  } | null;
+  mapAltitude: number | null;
 }
 
 

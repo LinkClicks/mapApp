@@ -23,6 +23,7 @@ interface TripData {
   route_height: number | null;
   map_center_latitude: number | null;
   map_center_longitude: number | null;
+  map_altitude: number | null;
 }
 
 const db = SQLite.openDatabase('mapApp.db');
@@ -134,6 +135,24 @@ const migrations = [
           if (!hasHeight) {
             tx.executeSql(`
               ALTER TABLE trips ADD COLUMN route_height REAL DEFAULT NULL;
+            `);
+          }
+        }
+      );
+    },
+  },
+  {
+    version: 5,
+    up: (tx: SQLite.SQLTransaction) => {
+      tx.executeSql(
+        "PRAGMA table_info(trips);",
+        [],
+        (_, { rows }) => {
+          const hasMapAltitude = rows._array.some(row => row.name === 'map_altitude');
+          
+          if (!hasMapAltitude) {
+            tx.executeSql(`
+              ALTER TABLE trips ADD COLUMN map_altitude REAL DEFAULT NULL;
             `);
           }
         }
@@ -262,15 +281,16 @@ export const updateRouteSettings = async (
   rotationAngle: number,
   width: number,
   height: number,
-  mapCenter: { latitude: number, longitude: number }
+  mapCenter: { latitude: number, longitude: number },
+  mapAltitude: number
 ): Promise<void> => {
   try {
     db.transaction(tx => {
       tx.executeSql(
-        'UPDATE trips SET rotation_angle = ?, route_width = ?, route_height = ?, map_center_latitude = ?, map_center_longitude = ? WHERE id = ?;',
-        [rotationAngle, width, height, mapCenter.latitude, mapCenter.longitude, id],
+        'UPDATE trips SET rotation_angle = ?, route_width = ?, route_height = ?, map_center_latitude = ?, map_center_longitude = ?, map_altitude = ? WHERE id = ?;',
+        [rotationAngle, width, height, mapCenter.latitude, mapCenter.longitude, mapAltitude, id],
         () => {
-          logMessage(`${FILE_PATH} - updateRouteSettings - Route settings updated for trip ID: ${id}. Rotation angle: ${rotationAngle}, width: ${width}, height: ${height}, map center: ${mapCenter.latitude}, ${mapCenter.longitude}`);
+          logMessage(`${FILE_PATH} - updateRouteSettings - Route settings updated for trip ID: ${id}. Rotation angle: ${rotationAngle}, width: ${width}, height: ${height}, map center: ${mapCenter.latitude}, ${mapCenter.longitude}, map altitude: ${mapAltitude}`);
         },
         (tx, error) => {
           logError(`${FILE_PATH} - updateRouteSettings - Error updating route settings`, error);
@@ -417,7 +437,8 @@ export const fetchTripsGroupedByMonth = async (): Promise<GroupedTrip[]> => {
                 routeDimensions: { width: row.route_width, height: row.route_height },
                 mapCenter: row.map_center_latitude && row.map_center_longitude
                   ? { latitude: row.map_center_latitude, longitude: row.map_center_longitude }
-                  : null, // Handle case where map center is not set
+                  : null, 
+                mapAltitude: row.map_altitude,
                 trackPoints: await fetchTrackingPoints(row.id),
                 flaggedTimestamps: await fetchFlaggedTimestamps(row.id),
               };
@@ -482,7 +503,7 @@ export const fetchAllTrips = async (): Promise<Trip[]> => {
             const allTrips: Trip[] = await Promise.all(
               trips.map(async (row: TripData) => {
                 const trackPoints = await fetchTrackingPoints(row.id);                
-                const flaggedTimestamps = await fetchFlaggedTimestamps(row.id); // Fetch flagged timestamps
+                const flaggedTimestamps = await fetchFlaggedTimestamps(row.id); 
 
                 console.log('trip found with id:', row.id, 'and start time:', new Date(row.start_time), 'and end time:', new Date(row.end_time));
                 
@@ -503,9 +524,10 @@ export const fetchAllTrips = async (): Promise<Trip[]> => {
                   },
                   mapCenter: row.map_center_latitude && row.map_center_longitude
                     ? { latitude: row.map_center_latitude, longitude: row.map_center_longitude }
-                    : null, // Handle case where map center is not set
+                    : null, 
+                  mapAltitude: row.map_altitude,
                   trackPoints,
-                  flaggedTimestamps, // Add flaggedTimestamps to the returned object
+                  flaggedTimestamps, 
                 };
               })
             );
@@ -746,7 +768,7 @@ export const clearRotationAndMapCenterForAllTrips = async (): Promise<void> => {
   try {
     db.transaction(tx => {
       tx.executeSql(
-        'UPDATE trips SET rotation_angle = NULL, map_center_latitude = NULL, map_center_longitude = NULL;',
+        'UPDATE trips SET rotation_angle = NULL, map_center_latitude = NULL, map_center_longitude = NULL, map_altitude = NULL;',
         [],
         () => {
           logMessage(`${FILE_PATH} - clearRotationAndMapCenterForAllTrips - Cleared rotation and map center for all trips.`);
